@@ -1,65 +1,134 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { FilterMode, LandFilter } from "@/lib/constants";
+import { decodeDeckList } from "@/lib/sharing";
+import { useBling } from "@/hooks/useBling";
+import DeckInput from "@/components/DeckInput";
+import FilterBar from "@/components/FilterBar";
+import LandFilterBar from "@/components/LandFilterBar";
+import BlingResults from "@/components/BlingResults";
+import LoadingState from "@/components/LoadingState";
+import ShareButton from "@/components/ShareButton";
+import AdSlot from "@/components/AdSlot";
+
+function BlingApp() {
+  const searchParams = useSearchParams();
+  const [decklist, setDecklist] = useState("");
+  const [filter, setFilter] = useState<FilterMode>(FilterMode.NONE);
+  const [landFilters, setLandFilters] = useState<Set<LandFilter>>(new Set());
+  const { state, runBling, reset } = useBling();
+
+  // Load from URL params on mount
+  useEffect(() => {
+    const decoded = decodeDeckList(searchParams);
+    if (decoded) {
+      setDecklist(decoded.decklist);
+      setFilter(decoded.filter);
+      setTimeout(() => {
+        runBling(decoded.decklist, decoded.filter);
+      }, 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleSubmit = () => {
+    if (!decklist.trim()) return;
+    runBling(decklist, filter, landFilters);
+  };
+
+  const isLoading = state.status === "loading";
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+      {/* Hero text */}
+      <div className="text-center space-y-2">
+        <h1 className="text-4xl md:text-5xl font-bold">
+          <span className="text-gold">Bling</span>{" "}
+          <span className="text-gray-200">My Deck</span>
+        </h1>
+        <p className="text-gray-400 text-lg max-w-xl mx-auto">
+          Paste your MTG decklist and find the most expensive printing of every
+          card. Because your deck deserves to shine.
+        </p>
+      </div>
+
+      {/* Top ad */}
+      <AdSlot slot="header-leaderboard" format="horizontal" className="flex justify-center" />
+
+      {/* Input section */}
+      <div className="space-y-4">
+        <DeckInput
+          value={decklist}
+          onChange={setDecklist}
+          onSubmit={handleSubmit}
+          disabled={isLoading}
+        />
+        <FilterBar
+          value={filter}
+          onChange={setFilter}
+          disabled={isLoading}
+        />
+        <LandFilterBar
+          value={landFilters}
+          onChange={setLandFilters}
+          disabled={isLoading}
+        />
+      </div>
+
+      {/* Loading state */}
+      {state.status === "loading" && state.progress && (
+        <LoadingState
+          current={state.progress.current}
+          total={state.progress.total}
+          cardName={state.progress.cardName}
+        />
+      )}
+
+      {/* Error state */}
+      {state.status === "error" && state.error && (
+        <div className="bg-red-900/20 border border-red-800 rounded-xl p-4 text-red-300 text-sm">
+          {state.error}
+        </div>
+      )}
+
+      {/* Results */}
+      {state.status === "done" && state.results && (
+        <div className="space-y-6">
+          <BlingResults results={state.results} />
+
+          <div className="flex items-center justify-between">
+            <ShareButton decklist={decklist} filter={filter} />
+            <button
+              onClick={reset}
+              className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
+            >
+              Start Over
+            </button>
+          </div>
+
+          {/* Mid-results ad */}
+          <AdSlot slot="mid-results" format="rectangle" className="flex justify-center" />
+        </div>
+      )}
+
+      {/* Bottom ad */}
+      <AdSlot slot="footer-leaderboard" format="horizontal" className="flex justify-center" />
+    </div>
+  );
+}
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <Suspense
+      fallback={
+        <div className="max-w-6xl mx-auto px-4 py-8 text-center text-gray-500">
+          Loading...
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      }
+    >
+      <BlingApp />
+    </Suspense>
   );
 }
