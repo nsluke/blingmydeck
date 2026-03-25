@@ -45,5 +45,16 @@ export function getCardImage(card: ScryfallCard): string | null {
 }
 
 export function getTcgPlayerUrl(card: ScryfallCard): string | null {
-  return card.purchase_uris?.tcgplayer ?? null;
+  const base = card.purchase_uris?.tcgplayer;
+  if (!base) return null;
+  // Replace Scryfall's affiliate tag with ours
+  try {
+    const url = new URL(base);
+    url.searchParams.set("partner", "6033214");
+    url.searchParams.set("utm_campaign", "affiliate");
+    url.searchParams.set("utm_source", "blingoutmydeck");
+    return url.toString();
+  } catch {
+    return base;
+  }
 }

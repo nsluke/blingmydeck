@@ -28,7 +28,7 @@ export default function AddToCartButton({ results }: AddToCartButtonProps) {
   const handleAddToCart = () => {
     const cardList = buildTcgMassEntryList(results);
     const encoded = encodeURIComponent(cardList);
-    const url = `https://www.tcgplayer.com/massentry?productline=magic&c=${encoded}&utm_campaign=affiliate&utm_medium=blingoutmydeck&utm_source=blingoutmydeck`;
+    const url = `https://www.tcgplayer.com/massentry?productline=magic&c=${encoded}&partner=6033214&utm_campaign=affiliate&utm_source=blingoutmydeck`;
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
