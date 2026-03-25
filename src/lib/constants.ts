@@ -49,4 +49,4 @@ export const BASIC_LAND_NAMES = new Set([
   "Wastes",
 ]);
 
-export const TCGPLAYER_AFFILIATE_TAG = "blingmydeck";
+export const TCGPLAYER_AFFILIATE_TAG = "blingoutmydeck";

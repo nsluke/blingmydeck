@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About — Bling My Deck",
+  title: "About — Bling Out My Deck",
   description:
-    "Learn how Bling My Deck helps you find the most expensive printings of every card in your MTG deck.",
+    "Learn how Bling Out My Deck helps you find the most expensive printings of every card in your MTG deck.",
 };
 
 export default function AboutPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-12 space-y-8">
-      <h1 className="text-3xl font-bold text-gold">About Bling My Deck</h1>
+      <h1 className="text-3xl font-bold text-gold">About Bling Out My Deck</h1>
 
       <div className="space-y-4 text-gray-300 leading-relaxed">
         <p>
-          <strong className="text-gray-100">Bling My Deck</strong> is a free
+          <strong className="text-gray-100">Bling Out My Deck</strong> is a free
           tool for Magic: The Gathering players who want to see what it would
           cost to &ldquo;bling out&rdquo; their deck — replacing every card with its
           most expensive available printing.

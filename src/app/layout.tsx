@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Bling My Deck — Find the Most Expensive MTG Card Printings",
+  title: "Bling Out My Deck — Find the Most Expensive MTG Card Printings",
   description:
     "Paste your Magic: The Gathering decklist and instantly find the most expensive printing of every card. Bling out your deck with foils, old borders, and rare printings.",
   keywords: [
@@ -27,17 +27,19 @@ export const metadata: Metadata = {
     "foil",
     "old border",
     "deck upgrade",
+    "bling out my deck",
   ],
   openGraph: {
-    title: "Bling My Deck — Find the Most Expensive MTG Card Printings",
+    title: "Bling Out My Deck — Find the Most Expensive MTG Card Printings",
     description:
       "Paste your decklist and instantly see the most blinged-out version of every card.",
     type: "website",
-    siteName: "Bling My Deck",
+    url: "https://blingoutmydeck.com",
+    siteName: "Bling Out My Deck",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Bling My Deck",
+    title: "Bling Out My Deck",
     description:
       "Paste your decklist and instantly find the most expensive printing of every card.",
   },

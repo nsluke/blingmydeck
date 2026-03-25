@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "FAQ — Bling My Deck",
+  title: "FAQ — Bling Out My Deck",
   description:
     "Frequently asked questions about finding the most expensive MTG card printings and blinging out your deck.",
 };

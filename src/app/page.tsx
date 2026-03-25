@@ -45,7 +45,7 @@ function BlingApp() {
       {/* Hero text */}
       <div className="text-center space-y-2">
         <h1 className="text-4xl md:text-5xl font-bold">
-          <span className="text-gold">Bling</span>{" "}
+          <span className="text-gold">Bling Out</span>{" "}
           <span className="text-gray-200">My Deck</span>
         </h1>
         <p className="text-gray-400 text-lg max-w-xl mx-auto">

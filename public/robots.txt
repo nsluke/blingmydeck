@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://blingmydeck.com/sitemap.xml
+Sitemap: https://blingoutmydeck.com/sitemap.xml

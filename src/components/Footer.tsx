@@ -19,7 +19,7 @@ export default function Footer() {
               . Prices are estimates updated daily.
             </p>
             <p>
-              Bling My Deck is not affiliated with Wizards of the Coast.
+              Bling Out My Deck is not affiliated with Wizards of the Coast.
               Magic: The Gathering is a trademark of Wizards of the Coast LLC.
             </p>
           </div>
@@ -28,7 +28,7 @@ export default function Footer() {
               Card purchase links may include affiliate tags.
             </p>
             <p className="text-gray-600">
-              &copy; {new Date().getFullYear()} Bling My Deck
+              &copy; {new Date().getFullYear()} Bling Out My Deck
             </p>
           </div>
         </div>
