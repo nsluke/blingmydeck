@@ -6,7 +6,11 @@ import { parseDeckList } from "@/lib/scryfall/parseDeckList";
 import { fetchCollection, fetchAllPrintings, fetchLandPrintings } from "@/lib/scryfall/client";
 import { blingDeck, selectBlingPrinting } from "@/lib/scryfall/blingAlgorithm";
 import { BASIC_LAND_NAMES } from "@/lib/constants";
-import { getCardImage } from "@/lib/scryfall/priceUtils";
+import { getCardImage, getBestPrice } from "@/lib/scryfall/priceUtils";
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
+}
 import type { ScryfallCard, BlingResult } from "@/lib/scryfall/types";
 
 export interface BlingProgress {
@@ -15,6 +19,8 @@ export interface BlingProgress {
   cardName: string;
   originalImageUri?: string;
   blingedImageUri?: string;
+  originalPrice?: number | null;
+  blingedPrice?: number | null;
   phase: "lookup" | "blinging";
 }
 
@@ -101,6 +107,7 @@ export function useBling() {
           const cacheKey = card.oracle_id;
           const isBasicLand = BASIC_LAND_NAMES.has(card.name);
           const originalImage = getCardImage(card) ?? undefined;
+          const originalPrice = getBestPrice(card)?.price ?? null;
 
           // Show the original card while we fetch printings
           setState((s) => ({
@@ -111,6 +118,8 @@ export function useBling() {
               cardName: card.name,
               originalImageUri: originalImage,
               blingedImageUri: undefined,
+              originalPrice,
+              blingedPrice: undefined,
               phase: "blinging",
             },
           }));
@@ -127,9 +136,10 @@ export function useBling() {
           }
           allPrintings.set(cacheKey, printings);
 
-          // Show the blinged result for this card
+          // Show the blinged result — pause briefly so user can see it
           const blinged = selectBlingPrinting(printings, filter);
           const blingedImage = blinged ? getCardImage(blinged.card) ?? undefined : undefined;
+          const blingedPrice = blinged?.price ?? null;
 
           completed++;
           setState((s) => ({
@@ -140,9 +150,14 @@ export function useBling() {
               cardName: card.name,
               originalImageUri: originalImage,
               blingedImageUri: blingedImage,
+              originalPrice,
+              blingedPrice,
               phase: "blinging",
             },
           }));
+
+          // Brief pause so the user can see the blinged result before moving on
+          await sleep(400);
         }
 
         if (abortRef.current) return;
