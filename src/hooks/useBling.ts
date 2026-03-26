@@ -4,13 +4,23 @@ import { useState, useCallback, useRef } from "react";
 import { FilterMode, LandFilter } from "@/lib/constants";
 import { parseDeckList } from "@/lib/scryfall/parseDeckList";
 import { fetchCollection, fetchAllPrintings, fetchLandPrintings } from "@/lib/scryfall/client";
-import { blingDeck } from "@/lib/scryfall/blingAlgorithm";
+import { blingDeck, selectBlingPrinting } from "@/lib/scryfall/blingAlgorithm";
 import { BASIC_LAND_NAMES } from "@/lib/constants";
+import { getCardImage } from "@/lib/scryfall/priceUtils";
 import type { ScryfallCard, BlingResult } from "@/lib/scryfall/types";
+
+export interface BlingProgress {
+  current: number;
+  total: number;
+  cardName: string;
+  originalImageUri?: string;
+  blingedImageUri?: string;
+  phase: "lookup" | "blinging";
+}
 
 export interface BlingState {
   status: "idle" | "loading" | "done" | "error";
-  progress: { current: number; total: number; cardName: string } | null;
+  progress: BlingProgress | null;
   results: BlingResult[] | null;
   error: string | null;
 }
@@ -32,7 +42,7 @@ export function useBling() {
       abortRef.current = false;
       setState({
         status: "loading",
-        progress: { current: 0, total: 0, cardName: "" },
+        progress: { current: 0, total: 0, cardName: "", phase: "lookup" },
         results: null,
         error: null,
       });
@@ -60,6 +70,7 @@ export function useBling() {
             current: 0,
             total: uniqueNames.length,
             cardName: "Looking up cards...",
+            phase: "lookup",
           },
         }));
 
@@ -89,17 +100,36 @@ export function useBling() {
 
           const cacheKey = card.oracle_id;
           const isBasicLand = BASIC_LAND_NAMES.has(card.name);
+          const originalImage = getCardImage(card) ?? undefined;
 
+          // Show the original card while we fetch printings
+          setState((s) => ({
+            ...s,
+            progress: {
+              current: completed,
+              total: collection.data.length,
+              cardName: card.name,
+              originalImageUri: originalImage,
+              blingedImageUri: undefined,
+              phase: "blinging",
+            },
+          }));
+
+          let printings: ScryfallCard[];
           if (printingsCache.has(cacheKey)) {
-            allPrintings.set(cacheKey, printingsCache.get(cacheKey)!);
+            printings = printingsCache.get(cacheKey)!;
           } else {
             // Basic lands have 800+ printings — use optimized search sorted by price
-            const printings = isBasicLand
+            printings = isBasicLand
               ? await fetchLandPrintings(card.name)
               : await fetchAllPrintings(card.prints_search_uri);
             printingsCache.set(cacheKey, printings);
-            allPrintings.set(cacheKey, printings);
           }
+          allPrintings.set(cacheKey, printings);
+
+          // Show the blinged result for this card
+          const blinged = selectBlingPrinting(printings, filter);
+          const blingedImage = blinged ? getCardImage(blinged.card) ?? undefined : undefined;
 
           completed++;
           setState((s) => ({
@@ -108,6 +138,9 @@ export function useBling() {
               current: completed,
               total: collection.data.length,
               cardName: card.name,
+              originalImageUri: originalImage,
+              blingedImageUri: blingedImage,
+              phase: "blinging",
             },
           }));
         }

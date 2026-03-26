@@ -79,11 +79,7 @@ function BlingApp() {
 
       {/* Loading state */}
       {state.status === "loading" && state.progress && (
-        <LoadingState
-          current={state.progress.current}
-          total={state.progress.total}
-          cardName={state.progress.cardName}
-        />
+        <LoadingState progress={state.progress} />
       )}
 
       {/* Error state */}
