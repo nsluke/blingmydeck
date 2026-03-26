@@ -74,20 +74,26 @@ export default function CardRow({ result, index }: CardRowProps) {
         </td>
 
         {/* Original Printing */}
-        <td className="px-3 py-2 text-sm text-gray-500 hidden md:table-cell">
-          <span
-            className="cursor-help"
+        <td className="px-3 py-2 text-sm hidden md:table-cell">
+          <a
+            href={original.scryfall_uri}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-500 hover:text-gray-300 transition-colors"
             onMouseEnter={(e) => handleMouseEnter(original, e)}
             onMouseLeave={handleMouseLeave}
           >
             {setLabel(original)}
-          </span>
+          </a>
         </td>
 
         {/* Blinged Printing */}
         <td className="px-3 py-2 text-sm">
-          <span
-            className={`cursor-help ${isUpgrade ? "text-gold" : "text-gray-400"}`}
+          <a
+            href={blinged.scryfall_uri}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`hover:underline transition-colors ${isUpgrade ? "text-gold hover:text-gold/80" : "text-gray-400 hover:text-gray-300"}`}
             onMouseEnter={(e) => handleMouseEnter(blinged, e)}
             onMouseLeave={handleMouseLeave}
           >
@@ -95,7 +101,7 @@ export default function CardRow({ result, index }: CardRowProps) {
             {finish && (
               <span className="ml-1 text-xs text-gold/60">({finish})</span>
             )}
-          </span>
+          </a>
         </td>
 
         {/* Price */}
