@@ -1,24 +1,39 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+
 interface AdSlotProps {
   slot: string;
   format?: "horizontal" | "rectangle";
   className?: string;
 }
 
-/**
- * Placeholder for Google AdSense ad unit.
- * Replace data-ad-client and data-ad-slot with real values once AdSense is approved.
- */
+declare global {
+  interface Window {
+    adsbygoogle: unknown[];
+  }
+}
+
 export default function AdSlot({
   slot,
   format = "horizontal",
   className = "",
 }: AdSlotProps) {
-  // In development, show a placeholder
-  const isDev = process.env.NODE_ENV === "development";
+  const adRef = useRef<HTMLModElement>(null);
+  const pushed = useRef(false);
 
-  if (isDev) {
+  useEffect(() => {
+    if (pushed.current) return;
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+      pushed.current = true;
+    } catch {
+      // AdSense not loaded yet or blocked by adblocker
+    }
+  }, []);
+
+  // In development, show a placeholder
+  if (process.env.NODE_ENV === "development") {
     return (
       <div
         className={`bg-gray-800/30 border border-dashed border-gray-700 rounded-lg flex items-center justify-center text-xs text-gray-600 ${
@@ -33,11 +48,12 @@ export default function AdSlot({
   return (
     <div className={className}>
       <ins
+        ref={adRef}
         className="adsbygoogle"
         style={{ display: "block" }}
-        data-ad-client="ca-pub-XXXXXXXXXX"
+        data-ad-client="ca-pub-9191648102867518"
         data-ad-slot={slot}
-        data-ad-format={format === "horizontal" ? "horizontal" : "rectangle"}
+        data-ad-format={format === "horizontal" ? "auto" : "rectangle"}
         data-full-width-responsive="true"
       />
     </div>

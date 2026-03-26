@@ -3,8 +3,9 @@
 import { useState, useCallback, useRef } from "react";
 import { FilterMode, LandFilter } from "@/lib/constants";
 import { parseDeckList } from "@/lib/scryfall/parseDeckList";
-import { fetchCollection, fetchAllPrintings } from "@/lib/scryfall/client";
+import { fetchCollection, fetchAllPrintings, fetchLandPrintings } from "@/lib/scryfall/client";
 import { blingDeck } from "@/lib/scryfall/blingAlgorithm";
+import { BASIC_LAND_NAMES } from "@/lib/constants";
 import type { ScryfallCard, BlingResult } from "@/lib/scryfall/types";
 
 export interface BlingState {
@@ -87,11 +88,15 @@ export function useBling() {
           if (abortRef.current) return;
 
           const cacheKey = card.oracle_id;
+          const isBasicLand = BASIC_LAND_NAMES.has(card.name);
 
           if (printingsCache.has(cacheKey)) {
             allPrintings.set(cacheKey, printingsCache.get(cacheKey)!);
           } else {
-            const printings = await fetchAllPrintings(card.prints_search_uri);
+            // Basic lands have 800+ printings — use optimized search sorted by price
+            const printings = isBasicLand
+              ? await fetchLandPrintings(card.name)
+              : await fetchAllPrintings(card.prints_search_uri);
             printingsCache.set(cacheKey, printings);
             allPrintings.set(cacheKey, printings);
           }

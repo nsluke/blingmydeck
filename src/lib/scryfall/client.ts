@@ -107,17 +107,47 @@ export async function fetchCollection(
 /**
  * Fetch all printings for a card using its prints_search_uri.
  * Handles pagination automatically.
+ * For basic lands (hundreds of printings), caps to maxPages to avoid excessive requests.
  */
 export async function fetchAllPrintings(
-  printSearchUri: string
+  printSearchUri: string,
+  maxPages: number = 0 // 0 = unlimited
 ): Promise<ScryfallCard[]> {
   const cards: ScryfallCard[] = [];
   let url: string | undefined = printSearchUri;
+  let page = 0;
 
   while (url) {
+    page++;
+    if (maxPages > 0 && page > maxPages) break;
     const res: ScryfallList = await scryfallGet<ScryfallList>(url);
     cards.push(...res.data);
     url = res.has_more ? res.next_page : undefined;
+  }
+
+  return cards;
+}
+
+/**
+ * Fetch printings for basic lands using Scryfall search ordered by price desc.
+ * This avoids fetching all 800+ printings and gets the most expensive ones first.
+ */
+export async function fetchLandPrintings(
+  cardName: string
+): Promise<ScryfallCard[]> {
+  const query = encodeURIComponent(`!"${cardName}" unique:prints`);
+  const url = `${BASE_URL}/cards/search?q=${query}&order=usd&dir=desc`;
+
+  // Just fetch first 2 pages (up to 350 printings) — more than enough for bling selection
+  const cards: ScryfallCard[] = [];
+  let currentUrl: string | undefined = url;
+  let page = 0;
+
+  while (currentUrl && page < 2) {
+    page++;
+    const res: ScryfallList = await scryfallGet<ScryfallList>(currentUrl);
+    cards.push(...res.data);
+    currentUrl = res.has_more ? res.next_page : undefined;
   }
 
   return cards;
