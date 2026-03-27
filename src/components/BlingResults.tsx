@@ -4,6 +4,8 @@ import type { BlingResult } from "@/lib/scryfall/types";
 import PriceSummary from "./PriceSummary";
 import CardRow from "./CardRow";
 import AddToCartButton from "./AddToCartButton";
+import ExportDecklistButton from "./ExportDecklistButton";
+import DownloadImagesButton from "./DownloadImagesButton";
 
 interface BlingResultsProps {
   results: BlingResult[];
@@ -34,8 +36,10 @@ export default function BlingResults({ results }: BlingResultsProps) {
     <div className="space-y-6">
       <PriceSummary results={results} />
 
-      <div className="flex justify-center">
+      <div className="flex flex-wrap justify-center gap-3">
         <AddToCartButton results={results} />
+        <ExportDecklistButton results={results} />
+        <DownloadImagesButton results={results} />
       </div>
 
       {sortedSections.map(([section, sectionResults]) => (
