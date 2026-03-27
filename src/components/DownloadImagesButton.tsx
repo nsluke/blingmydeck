@@ -9,10 +9,10 @@ interface DownloadImagesButtonProps {
 }
 
 function getCardImageUrl(card: BlingResult["blinged"]): string | null {
-  if (card.image_uris?.png) return card.image_uris.png;
-  if (card.card_faces?.[0]?.image_uris?.png) return card.card_faces[0].image_uris.png;
   if (card.image_uris?.large) return card.image_uris.large;
   if (card.card_faces?.[0]?.image_uris?.large) return card.card_faces[0].image_uris.large;
+  if (card.image_uris?.normal) return card.image_uris.normal;
+  if (card.card_faces?.[0]?.image_uris?.normal) return card.card_faces[0].image_uris.normal;
   return null;
 }
 
@@ -50,7 +50,7 @@ export default function DownloadImagesButton({ results }: DownloadImagesButtonPr
         const response = await fetch(url);
         if (!response.ok) continue;
         const blob = await response.blob();
-        const ext = url.includes(".png") ? ".png" : ".jpg";
+        const ext = ".jpg";
 
         let filename = sanitizeFilename(name);
         const count = usedNames.get(filename) ?? 0;
