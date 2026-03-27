@@ -2,6 +2,8 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+See it live at [blingoutmydeck.com](https://blingoutmydeck.com/)
+
 First, run the development server:
 
 ```bash
